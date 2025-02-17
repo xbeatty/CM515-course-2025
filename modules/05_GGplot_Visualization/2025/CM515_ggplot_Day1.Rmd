@@ -1,0 +1,121 @@
+---
+title: "CM515 Day 1: Plotting with ggplot()"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(datasets)
+library(tidyverse)
+library(knitr)
+library(ggplot2)
+```
+
+### Goal: Utilize tidy data to generate complex graphs with few lines of code
+
+### Start by loading the data
+
+```{r}
+mpg <- mpg
+```
+
+### Check out the data
+
+```{r}
+# What are 5 functions we could use to explore the mpg dataset?
+str(mpg)
+
+summary(mpg)
+
+colnames(mpg)
+
+?mpg
+
+head(mpg)
+
+# Which manufacturer has the most models in this dataset?
+mpg %>%
+  count(model) %>%
+  arrange(n)
+
+mpg %>%
+  count(model) %>%
+  arrange(desc(n))
+```
+
+This dataset suggests many interesting questions. How are engine size and fuel economy related? Do certain manufacturers care more about fuel economy than others? Has fuel economy improved in the last ten years? We will try to answer some of these questions, and in the process learn how to create some basic plots with ggplot2.
+
+### Every ggplot has three key components:
+
+-   Data
+-   Aesthetic mappings between variables in the data
+-   A layer to render the information (geom)
+
+### A simple example
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) + 
+  geom_point()
+
+# Fill in the following:
+# Data: mpg
+# Aesthetic: engine oil displacement to fuel economy
+# Layers: point
+# Plus sign location: end of first line
+```
+
+### x and y aesthetic can be implied
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point()
+
+
+
+```
+
+
+```{r}
+# Do these data look similar when comparing engine displacement to city miles per gallon?
+ggplot(mpg, aes(displ, cty)) +
+  geom_point()
+
+# How could we more easily compare the highway and city miles per gallon?
+library(gridExtra)
+
+p1 <- ggplot(mpg, aes(displ, hwy)) +
+  geom_point()
+
+p2 <- ggplot(mpg, aes(displ, cty)) +
+  geom_point()
+
+grid.arrange(p1, p2, ncol = 2)
+```
+
+
+# Color, size, shape and other aesthetic attributes
+
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(colour = "blue"))
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(colour = "blue")
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy, color = class)) + 
+  geom_point()
+```
+
+
+
+# Princples of good graphics
+
+
+# Appendix
+
+```{r show-code, ref.label = all_labels(), echo = TRUE, eval = FALSE}
+
+```
