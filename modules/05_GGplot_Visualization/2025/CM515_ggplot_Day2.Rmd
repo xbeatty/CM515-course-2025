@@ -11,10 +11,13 @@ library(ggplot2)
 library(ggthemes)
 ```
 
+## Day 2
 
+Start with Day 2 homework, which includes questions 6 - 10!
+
+## Dashboard example
 
 # Appendix
 
 ```{r show-code, ref.label = all_labels(), echo = TRUE, eval = FALSE}
-
 ```
