@@ -1,0 +1,214 @@
+---
+title: "Bio File Formats in R"
+author: "David C. King"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## File formats in biology
+
+Many file formats in biology are plain text, but conform to a certain
+structure.
+
+-   Sequences- DNA, RNA, protein
+
+-   Sequence reads - fastq
+
+-   Sequence Alignments- MAF, SAM/BAM
+
+-   Phylogenetic trees - Newick, Phylip
+
+-   Genomic Coordinates and Annotations - BED, GTF, GFF
+
+-   Microscopy images - tiff, raw
+
+-   Protein Structure - pdb
+
+-   Mass Spectrography
+
+-   Analysis output – tidy data, csv
+
+-   Compressed files - gzip, tar, zip
+
+## DNA/RNA and Amino Acid Sequences
+
+Purpose:
+
+-   Understand sequence content, properties.
+
+-   Domains/Structure/Function.
+
+-   Variation: SNPs, indels, transitions/transversions.
+
+-   Identity of a gene, relationship to other genes, other species
+    (paralogs/orthologs).
+
+-   Next-gen sequencing- the presence and identity of the sequence is a
+    measurement (a count of expressed transcripts, enriched fragments)
+
+-   Design primers for PCR
+
+### FASTA Format
+
+Comes from FAST sequence aligner. Fast**n**: nucleotide; Fast**p**:
+protein: Fast**a**: all.
+
+Definition:
+
+<https://en.wikipedia.org/wiki/FASTA_format>
+
+<https://www.ncbi.nlm.nih.gov/genbank/fastaformat/>
+
+1.  Header line starts with "\>" followed by the name of the sequence.
+    More information can be provided but must be on the same line.
+2.  Sequence follows on one or more lines.
+3.  Multiple header/sequence pairs can be in the same file (sometimes
+    this is called "multi-fasta")
+
+Examples:
+
+```         
+>gi|1817694395|ref|NZ_JAAGMU010000151.1| Streptomyces sp. SID7958 contig-52000002, whole genome shotgun sequence
+CCGGCTGGCGCGGCTGGCGCTGGCGGTGGGGCTGCGGCTGCTGGAGCTGGGGGTGGCGCTGGAGGCGCAC
+GGCCAGAACCTGCTGGTGGTGCTGTCGCCGTCCGGGGAGCCGCGGCGGCTGGTCTACCGCGATCTGGCGG
+ACATCCGGGTCTCCCCCGCGCGGCTGGCCCGGCACGGTATCCGGGTTCCGGACCTGCCGGCG
+
+>gi|1643051563|gb|SZWM01000399.1| Citrobacter sp. TBCS-14 contig3128, whole genome shotgun sequence
+GCACAGTGAGATCAGCATTCCGTTGGATCTACTGGTCAATCAAAACCTGACGCTGGGTACTGAATGGAAC
+CAGCAGCGCATGAAGGACATGCTGTCTAACTCGCAGACCTTTATGGGCGGTAATATTCCAGGCTACAGCA
+GCACCGATCGCAGCCCATATTCGAAAGCCGAGATCTTCTCTTTGTTTGCCGAAAACAACATG
+```
+
+These sequences have a complex header with multiple, \|-delimited
+fields.
+
+What's missing? Sequence annotations and features.
+
+-   Example: Say there is a stem-loop at position 150-200. Have to
+    record it separately.
+
+-   Exception: masking with uppercase/lowercase, or another symbol (i.e.
+    N, X)
+
+#### Masking
+
+Sequence aligners are often tripped up by short repeat fragments and low
+complexity regions. RepeatMasker is a common tool for finding repeats
+and *masking* them.
+
+##### Hard Masking
+
+(David Make this example up)
+
+In the Streptomyces example above, replace nucleotide letter with 'N' if
+sequence is in a repeat (found by RepeatMasker)
+
+```         
+CCGGCTGGCGCGGCTGGCGCTGGCGGTGGGGCTGCGGCTGCTGGAGCTGGGGGNNNNNNNNNNNNNNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNCTGGTCTACCGCGATCTGGCGG
+ACATCCGGGTCTCCCCCGCGCGGCTGGCCCGGCACGGTATCCGGGTTCCGGACCTGCCGGCG
+```
+
+Software that deals with sequence analysis will be forced to ignore the
+N's., but maintain the spacing.
+
+##### Soft Masking
+
+Sometimes you want to retain the sequence, but convey that it is masked.
+This is usually done with the masked bases being converted to lowercase.
+
+```         
+CCGGCTGGCGCGGCTGGCGCTGGCGGTGGGGCTGCGGCTGCTGGAGCTGGGGGtggcgctggaggcgcac
+ggccagaacctgctggtggtgctgtcgccgtccggggagccgcggcggCTGGTCTACCGCGATCTGGCGG
+ACATCCGGGTCTCCCCCGCGCGGCTGGCCCGGCACGGTATCCGGGTTCCGGACCTGCCGGCG
+```
+
+Software might not take case into account, it depends on the
+application, and behavior can be configured.
+
+### In R
+
+```{r fasta, include=FALSE}
+# include=FALSE above because there are a lot of info messages when loading this library (clutters output)
+library(Biostrings)
+```
+
+```{r fasta read in}
+
+# Read from a fasta file
+seqs = readDNAStringSet("seqs_for_markdown.fasta")
+seqs
+
+# Save the names because they are long, and use shorter ones
+long_names = names(seqs)
+names(seqs) = c("Streptomyces","Citrobacter")
+seqs
+```
+
+```{r}
+# Some functions
+
+## Dinucleotide frequencies
+oligonucleotideFrequency(seqs[1], 2)
+oligonucleotideFrequency(seqs[2], 1, as.prob=T)
+
+
+# look at hexamers for the most common ones
+hexamer_frequencies = oligonucleotideFrequency(seqs[1], 6) # matrix of one row, 4096 columns
+hexamer_frequencies[1,1:10] # can't use head on a wide object like this
+descending_order = order(hexamer_frequencies, decreasing = TRUE) # returns the INDEX of the the largest hex frequency, followed by the next largest, etc.
+descending_order[1:10] # top 10 hexamer indices
+hexamer_frequencies[,descending_order[1:10]] # top ten hexamers (in a matrix)
+top10 = names(hexamer_frequencies[,descending_order[1:10]]) # get the hexamers from the names
+
+
+# turn the top10 into a sequence object
+dict0 = DNAStringSet(top10)
+pdict0 = PDict(dict0) # PDict for Pattern DICTionary
+
+# find the occurences of the top 10 hexamers in the sequence
+matches = matchPDict(pdict0, seqs[[1]])
+for (i in 1:10) {print(top10[i]); print(replaceAt(seqs[[1]], matches[[i]], value = 'NNNNNN'))}
+```
+
+```{r Biostrings example}
+expectedDinucleotideFrequency <- function(x)
+{
+    # Individual base frequencies.
+    bf <- alphabetFrequency(x, baseOnly=TRUE)[DNA_BASES]
+    (as.matrix(bf) %*% t(bf) - diag(bf)) / length(x)
+}
+
+## On Celegans chrI:
+library(BSgenome.Celegans.UCSC.ce11)
+chrI <- Celegans$chrI
+obs_df <- dinucleotideFrequency(chrI, as.matrix=TRUE)
+obs_df  # CG has the lowest frequency
+exp_df <- expectedDinucleotideFrequency(chrI)
+## A sanity check:
+stopifnot(as.integer(sum(exp_df)) == sum(obs_df))
+
+## Ratio of observed frequency to expected frequency:
+obs_df / exp_df  # TA has the lowest ratio, not CG!
+```
+
+## Annotation Databases
+
+NCBI
+
+Enbsembl
+
+### Dog gene example
+
+[Ensembl *Canis lupus familiaris* HOXA4 (for German
+Shephard)](https://useast.ensembl.org/Canis_lupus_familiarisgermanshepherd/Transcript/Exons?db=core;g=ENSCAFG00805011771;r=14:40378329-40397144;t=ENSCAFT00805021651 "Link to transcript view"){.uri}
