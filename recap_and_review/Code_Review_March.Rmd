@@ -1,0 +1,157 @@
+---
+title: "Code Review"
+author: "David C. King"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+## Some questions from class
+
+### Equality and assignment operators
+
+The arrow notation `varname <- value` is equivalent to `varname = value`. It exists for backward compatibility in R's beginnings from S, which descended from something called APL which was designed a long time ago for a different keyboard that had a lot of mathematical symbols.
+
+[![APL keyboard](img/410px-APL-keybd2.svg.webp)](https://en.wikipedia.org/wiki/APL_(programming_language))
+
+There it is, next to the P key.
+
+The following are equivalent:
+
+1. `varname = value`
+
+2. `varname <- value`
+
+3. `value -> varname` **WHAT**
+
+```{r R assignment, echo=T}
+cat("1. using the =\n")  # print this message
+varname = 3              # make assignment with '='
+varname                  # check that it's right
+
+cat("2. using the <-\n") # print this message
+varname <- 3             # make assignment with '<-'
+varname                  # should read `[1] 3`
+
+cat("3. using the ->\n") # print this message
+3 -> varname             # make assignment with '<-'
+varname                  # still reads `[1] 3` 
+
+```
+
+One benefit is the left-right flow of a pipe demonstrated below.
+
+
+```{r as the receiver of pipes}
+
+# as the result of a pipe: start to finish
+# start %>% function %>% .. -> finish
+mtcars %>% select(wt,qsec) -> arrow_left_to_right
+
+# ARE THEY REALLY THE SAME?
+
+arrow_right_to_left <- mtcars %>% select(wt,qsec) 
+equal_sign_right_to_left = mtcars %>% select(wt,qsec) 
+
+cat("Should be three lines of `[1] TRUE`\n")
+all.equal(arrow_right_to_left, equal_sign_right_to_left)
+all.equal(arrow_left_to_right, equal_sign_right_to_left)
+all.equal(arrow_left_to_right, arrow_right_to_left)
+```
+
+## Operators and functions for Comparison
+
+### Basic comparisons
+
+Every language has a type called `boolean` or `logical` with only two possible values: TRUE and FALSE.
+
+```
+> var == 3
+[1] TRUE
+```
+
+R is vector-centric, and its strength as a language is in cases like the one below:
+
+```{r vector comparisons to a single value}
+
+vec = c(1,2,3,4)
+
+vec == 3
+```
+
+
+
+```{r vector comparisons to a single value (multiple matches) }
+# this time vec has more than one TRUE element
+
+vec = c(3,1,2,3,4,3)
+
+vec == 3  # vector of logicals (TRUE is 3, FALSE otherwise)
+```
+
+
+There are many applications for this. One is for indexing:
+
+
+```{r vector comparisons for indexing }
+# this time vec has more than one TRUE element
+
+vec = c(3,1,2,3,4,3)
+
+vec == 3  # vector of logicals (TRUE is 3, FALSE otherwise)
+
+which(vec == 3)  # any position (INDEX) of a TRUE element
+
+indices = which(vec == 3)
+
+vec[indices] # extract the values that are '3'
+
+```
+
+
+```{r a more useful case of indexing }
+# this time vec has more than one TRUE element
+
+vec = c(3,1,2,3,4,3)
+
+vec >= 3  # vector of logicals (TRUE >= 3, FALSE otherwise)
+
+which(vec >= 3)  # the INDEX of the TRUE elements
+
+indices = which(vec >= 3)
+
+vec[ indices ]
+
+```
+
+### More functions to work with comparisons and logicals
+
+#### the number of true comparisons
+
+```{r working with logicals}
+# this time vec has more than one TRUE element
+
+vec = c(3,1,2,3,4,3)
+
+cat("vec:\n")
+vec
+
+vec >= 3  # vector of logicals (TRUE >= 3, FALSE otherwise)
+
+cat("The number of elements >= 3\n")
+
+sum(vec >= 3)
+
+```
+#### one value summarizing all comparisons
+
+```{r summary functions any and all}
+vec = c(3,1,2,3,4,3)
+any(vec >= 3) # TRUE
+all(vec >= 3) # FALSE
+
+```
