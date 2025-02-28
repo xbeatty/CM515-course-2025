@@ -205,7 +205,7 @@ mpg  %>%  filter(which(class == 'minivan'))  # this is an error
 # but you can make an expression with row_number, %in%, and which, that works
 
 
-mpg  %>%  filter(row_number(mpg) %in% which(class == 'minivan')) -> mini5 # this works, but is unnecessary and clunky
+mpg  %>%  filter(row_number() %in% which(class == 'minivan')) -> mini5 # this works, but is unnecessary and clunky
 
 
 mini4 == mini5
