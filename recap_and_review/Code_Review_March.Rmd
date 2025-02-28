@@ -155,3 +155,59 @@ any(vec >= 3) # TRUE
 all(vec >= 3) # FALSE
 
 ```
+
+## Applications for pipes
+
+```{r}
+mpg = ggplot2::mpg     # load mpg from pkg
+table(mpg$class)       # how many of each type
+
+mpg$class == 'minivan' # returns a  vector of TRUE/FALSE the same 
+                       # length as the number of rows in mpg.
+                       # TRUE when class is minivan, else FALSE
+
+###### The following are equivalent
+# 1. Base R (no pipes). Subset by a logical vector the same length as nrows(mpg)
+mini1 = mpg[ mpg$class == 'minivan', ] 
+dim(mini1) # 11 rows, 11 columns
+
+# 2. Base R. Ask for specific rows by row number
+which_rows_are_minivans = which(mpg$class == 'minivan')
+which_rows_are_minivans
+
+mini2 = mpg[ which_rows_are_minivans, ]
+dim(mini2)
+
+# same result ???
+mini1 == mini2       # cell-wise comparison gives a table of TRUE/FALSE
+all(mini1 == mini2)  # do all cells of the dataframes match?
+
+# now using filter(), a dplyr function, but not using a pipe
+mini3 = filter(mpg, class == 'minivan')
+
+mini2 == mini3        # cell-wise comparison gives a table of TRUE/FALSE
+all(mini2 == mini3)   # do all cells of the dataframes match?
+
+# Now using dplyr filter() with pipes
+# A Pipe is written left-to-right
+# start      %>%       operation(s)                        -> finish
+mpg          %>%   filter(class == 'minivan')              -> mini4
+# dataframe  %>%  filter function with logical expression  -> variable name
+
+mini3 == mini4
+all(mini3 == mini4)
+
+# all of mini1 mini2 mini3 and mini4 are identical (transitive property of equality)
+
+
+# you CANNOT pass indices directly to filter()
+mpg  %>%  filter(which(class == 'minivan'))  # this is an error
+# but you can make an expression with row_number, %in%, and which, that works
+
+
+mpg  %>%  filter(row_number(mpg) %in% which(class == 'minivan')) -> mini5 # this works, but is unnecessary and clunky
+
+
+mini4 == mini5
+all(mini4 == mini5)
+```
