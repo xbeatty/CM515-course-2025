@@ -1,0 +1,79 @@
+---
+title: "GGPLOT Review"
+author: "David/Meg"
+date: "2025-02-26"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## GGplot Review
+
+### Learning objectives
+
+-   GGPlot
+    -   Mapping your dataframe columns to axes
+    -   Choosing a geometry for different visualizations
+    -   Modifying plot specifics
+
+### GGPlot Basic structure
+
+What are the 3 minimum parts to make a plot using ggplot2?
+
+```         
+ggplot(..., aes(...))   +   ...
+        /\       /\          /\
+        1.       2.           3.
+```
+
+Give a description and example for each:
+
+1.  
+
+2.  
+
+3.  
+
+### Constructing plots
+
+Look at this plot of data from ***mpg***:
+
+![Plot of MPG data](mpg_data_plot1.png)
+
+Answer these questions:
+
+1.  What are the axes?
+2.  What aesthetics are mapped?
+3.  What is the geometry?
+
+```{r reproduce graph 1, echo=T}
+
+# Reproduce the inline graph using the mpg dataset and ggplot2
+
+# uncomment: ggplot(..., aes(...)) + ...
+
+
+```
+
+Another graph, this time using the births data
+
+Read-in US Births data again.
+
+```{r}
+usb = read.csv("https://github.com/Colorado-State-University-CMB/CM515-course-2025/raw/refs/heads/main/modules/05_GGplot_Visualization/2025/US_births_2000-2014_SSA.csv")
+```
+
+
+Reproduce the following graph:
+
+![Plot of US births data](usbirths_plot1.png)
+
+```{r reproduce graph 2, echo=T, include = T}
+# uncomment and fill in: ggplot(..., aes(x=..., y=...)) + geom_...() + ...
+ggplot(usb, aes(x=day_of_week, y=births)) + geom_jitter() + ggtitle("US births data")
+```
