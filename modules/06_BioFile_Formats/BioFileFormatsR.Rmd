@@ -106,9 +106,14 @@ Sequence aligners are often tripped up by short repeat fragments and low
 complexity regions. RepeatMasker is a common tool for finding repeats
 and *masking* them.
 
+One convention is to use the character N for a hard-masked DNA sequence,
+or use lowercase letters for softmasking. *This doesn't work if N is
+being used for an ambiguity (the exact base at that position is
+uncertain).*
+
 ##### Hard Masking
 
-(David Make this example up)
+(David made this example up)
 
 In the Streptomyces example above, replace nucleotide letter with 'N' if
 sequence is in a repeat (found by RepeatMasker)
@@ -204,11 +209,76 @@ obs_df / exp_df  # TA has the lowest ratio, not CG!
 
 ## Annotation Databases
 
-NCBI
+Gene annotations, sequences, other data that can be mapped to genes from
+a variety of sources/experiments.
 
-Enbsembl
+NCBI - National Center for Biotechnology Information
 
-### Dog gene example
+UCSC Genome Browser - University of California Santa Cruz
+
+[Ensembl](https://useast.ensembl.org/index.html "Ensembl Genome Browser") -
+European Bioinformatics Institute
+
+### Ensembl Genome Browser
 
 [Ensembl *Canis lupus familiaris* HOXA4 (for German
 Shephard)](https://useast.ensembl.org/Canis_lupus_familiarisgermanshepherd/Transcript/Exons?db=core;g=ENSCAFG00805011771;r=14:40378329-40397144;t=ENSCAFT00805021651 "Link to transcript view"){.uri}
+
+[![HOX A4, German
+Shephard](img/doghox_screenshot.png)](https://useast.ensembl.org/Canis_lupus_familiarisgermanshepherd/Transcript/Exons?db=core;g=ENSCAFG00805011771;r=14:40378329-40397144;t=ENSCAFT00805021651)
+
+#### Tracks and Configuration
+
+-   Tracks displayed in screenshot
+
+    -   Contigs - sequence assembly
+    -   Genes (Ensembl) - The Enbsembl gene annotations; others may be
+        included
+
+-   Configuration
+
+    -   Tabs: Gene/Transcript
+    -   Add/remove tracks
+    -   Legend, Strand, scale
+    -   Export options
+
+##### Adding tracks
+
+Click on *Region in Detail*
+
+![HOX A4, German
+Shephard](img/doghox_screenshot_highlight.png){width="66%"}
+
+Chose some tracks to show, exported the image.
+
+![HOX A4, German
+Shephard](img/Dog___German_Shepherd_1440418485_40534882.png)
+
+Changes:
+
+- Zoomed out
+- TSS (eponine) - Transciption start sites
+- GC% Continuous, numeric data
+
+Experiment with adding/hiding tracks:
+
+
+![HOX A4, German
+Shephard](img/Genome_view_highlighted.png)
+
+##### For Comparison HOXA4 at UCSC
+
+<https://genome.ucsc.edu/s/davidcking/canFam4_hoxA10>
+
+They don't have the rest of the gene cluster!?!?!
+
+### Exercise as a group
+
+Purpose: brainstorm how to represent data in a dataframe
+
+**What would be a good tidy way to represent track data in a dataframe?**
+
+- What would the rows be?
+- What would the columns be?
+- How many observations per row?
+
