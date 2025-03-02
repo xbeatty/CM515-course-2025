@@ -282,3 +282,67 @@ Purpose: brainstorm how to represent data in a dataframe
 - What would the columns be?
 - How many observations per row?
 
+```{r helper_func}
+# Just run this code chunk
+gff_gene_to_bed <- function(gene_features, gene_id = NA) {
+  # Convert start to 0-based for BED format
+  bed_start <- min(start(gene_features)) - 1
+  bed_end <- max(end(gene_features))
+
+  # If present, extract CDS regions (for thickStart and thickEnd) 
+  # if not, use bed start/end
+  cds <- gene_features[mcols(gene_features)$type == "CDS", ]
+  thick_start <- ifelse(length(cds) > 0, min(start(cds)) - 1, bed_start)
+  thick_end <- ifelse(length(cds) > 0, max(end(cds)), bed_end)
+  
+  exons <- gene_features[mcols(gene_features)$type == "exon", ]
+  block_count <- length(exons)
+  if (block_count > 0)
+  {
+    if (as.logical(strand(exons)[1] == '+'))
+    {
+        block_sizes <- paste(width(exons), collapse = ",")
+    } 
+    else 
+    {
+        block_sizes <- paste(rev(width(exons)), collapse = ",")
+    }
+    block_starts <- paste(sort(start(exons) - bed_start - 1), collapse = ",")    
+  }
+  
+  # Construct BED format
+  bed_line <- data.frame(
+  chrom = paste("chr",as.character(seqnames(gene_features)[1]),sep=''),
+  start = bed_start,
+  end = bed_end,
+  name = gene_id,
+  score = 1000, # 0-1000
+  strand = as.character(strand(gene_features)[1]),
+  thickStart = thick_start,
+  thickEnd = thick_end,
+  itemRgb = "0",  # Default value for BED
+  blockCount = block_count,
+  blockSizes = block_sizes,
+  blockStarts = block_starts
+  )
+
+  bed_line
+}
+```
+
+```{r GFF}
+library(rtracklayer) # for import 
+hoxA4_url = "https://useast.ensembl.org/Canis_lupus_familiarisgermanshepherd/Export/Output/Gene?db=core;flank3_display=0;flank5_display=0;g=ENSCAFG00805011771;output=gff3;r=14:40378329-40397144;strand=feature;t=ENSCAFT00805021651;param=gene;param=transcript;param=exon;param=intron;param=cds;_format=Text"
+# you can see the requested fields listed above
+
+# download it for import
+download.file(hoxA4_url, 
+              "hoxA4.gff", 
+              headers = c("User-Agent" = "curl/7.88.1")) # had to figure this out, not always necessary
+hoxA4 = import("hoxA4.gff")
+bed_hoxA4 = gff_gene_to_bed(hoxA4, 'hoxA4')
+bed_hoxA4
+write.table(bed_hoxA4, "hoxA4.bed",row.names = FALSE, quote = FALSE, sep = "\t", col.names=F)
+
+```
+
