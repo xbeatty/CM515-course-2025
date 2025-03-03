@@ -1,0 +1,454 @@
+---
+title: "Bio File Formats in R"
+author: "David C. King"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: leonids
+    highlight: github
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## File formats in biology
+
+Many file formats in biology are plain text, but conform to a certain
+structure.
+
+-   Sequences- DNA, RNA, protein
+
+-   Sequence reads - fastq
+
+-   Sequence Alignments- MAF, SAM/BAM
+
+-   Phylogenetic trees - Newick, Phylip
+
+-   Genomic Coordinates and Annotations - BED, GTF, GFF
+
+-   Microscopy images - tiff, raw
+
+-   Protein Structure - pdb
+
+-   Mass Spectrography
+
+-   Analysis output – tidy data, csv
+
+-   Compressed files - gzip, tar, zip
+
+## DNA/RNA and Amino Acid Sequences
+
+Purpose:
+
+-   Understand sequence content, properties.
+
+-   Domains/Structure/Function.
+
+-   Variation: SNPs, indels, transitions/transversions.
+
+-   Identity of a gene, relationship to other genes, other species
+    (paralogs/orthologs).
+
+-   Next-gen sequencing- the presence and identity of the sequence is a
+    measurement (a count of expressed transcripts, enriched fragments)
+
+-   Design primers for PCR
+
+### FASTA Format
+
+Comes from FAST sequence aligner. Fast**n**: nucleotide; Fast**p**:
+protein: Fast**a**: all.
+
+Definition:
+
+<https://en.wikipedia.org/wiki/FASTA_format>
+
+<https://www.ncbi.nlm.nih.gov/genbank/fastaformat/>
+
+1.  Header line starts with "\>" followed by the name of the sequence.
+    More information can be provided but must be on the same line.
+2.  Sequence follows on one or more lines.
+3.  Multiple header/sequence pairs can be in the same file (sometimes
+    this is called "multi-fasta")
+
+Examples:
+
+```         
+>gi|1817694395|ref|NZ_JAAGMU010000151.1| Streptomyces sp. SID7958 contig-52000002, whole genome shotgun sequence
+CCGGCTGGCGCGGCTGGCGCTGGCGGTGGGGCTGCGGCTGCTGGAGCTGGGGGTGGCGCTGGAGGCGCAC
+GGCCAGAACCTGCTGGTGGTGCTGTCGCCGTCCGGGGAGCCGCGGCGGCTGGTCTACCGCGATCTGGCGG
+ACATCCGGGTCTCCCCCGCGCGGCTGGCCCGGCACGGTATCCGGGTTCCGGACCTGCCGGCG
+
+>gi|1643051563|gb|SZWM01000399.1| Citrobacter sp. TBCS-14 contig3128, whole genome shotgun sequence
+GCACAGTGAGATCAGCATTCCGTTGGATCTACTGGTCAATCAAAACCTGACGCTGGGTACTGAATGGAAC
+CAGCAGCGCATGAAGGACATGCTGTCTAACTCGCAGACCTTTATGGGCGGTAATATTCCAGGCTACAGCA
+GCACCGATCGCAGCCCATATTCGAAAGCCGAGATCTTCTCTTTGTTTGCCGAAAACAACATG
+```
+
+These sequences have a complex header with multiple, \|-delimited
+fields.
+
+What's missing? Sequence annotations and features.
+
+-   Example: Say there is a stem-loop at position 150-200. Have to
+    record it separately.
+
+-   Exception: masking with uppercase/lowercase, or another symbol (i.e.
+    N, X)
+
+#### Masking
+
+Sequence aligners are often tripped up by short repeat fragments and low
+complexity regions. RepeatMasker is a common tool for finding repeats
+and *masking* them.
+
+One convention is to use the character N for a hard-masked DNA sequence,
+or use lowercase letters for softmasking. *This doesn't work if N is
+being used for an ambiguity (the exact base at that position is
+uncertain).*
+
+##### Hard Masking
+
+(David made this example up)
+
+In the Streptomyces example above, replace nucleotide letter with 'N' if
+sequence is in a repeat (found by RepeatMasker)
+
+```         
+CCGGCTGGCGCGGCTGGCGCTGGCGGTGGGGCTGCGGCTGCTGGAGCTGGGGGNNNNNNNNNNNNNNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNCTGGTCTACCGCGATCTGGCGG
+ACATCCGGGTCTCCCCCGCGCGGCTGGCCCGGCACGGTATCCGGGTTCCGGACCTGCCGGCG
+```
+
+Software that deals with sequence analysis will be forced to ignore the
+N's., but maintain the spacing.
+
+##### Soft Masking
+
+Sometimes you want to retain the sequence, but convey that it is masked.
+This is usually done with the masked bases being converted to lowercase.
+
+```         
+CCGGCTGGCGCGGCTGGCGCTGGCGGTGGGGCTGCGGCTGCTGGAGCTGGGGGtggcgctggaggcgcac
+ggccagaacctgctggtggtgctgtcgccgtccggggagccgcggcggCTGGTCTACCGCGATCTGGCGG
+ACATCCGGGTCTCCCCCGCGCGGCTGGCCCGGCACGGTATCCGGGTTCCGGACCTGCCGGCG
+```
+
+Software might not take case into account, it depends on the
+application, and behavior can be configured.
+
+### In R
+
+```{r fasta, include=FALSE}
+# include=FALSE above because there are a lot of info messages when loading this library (clutters output)
+library(Biostrings)
+```
+
+```{r fasta read in}
+
+# Read from a fasta file
+seqs = readDNAStringSet("seqs_for_markdown.fasta")
+seqs
+
+# Save the names because they are long, and use shorter ones
+long_names = names(seqs)
+names(seqs) = c("Streptomyces","Citrobacter")
+seqs
+```
+
+```{r}
+# Some functions
+
+## Dinucleotide frequencies
+oligonucleotideFrequency(seqs[1], 2)
+oligonucleotideFrequency(seqs[2], 1, as.prob=T)
+
+
+# look at hexamers for the most common ones
+hexamer_frequencies = oligonucleotideFrequency(seqs[1], 6) # matrix of one row, 4096 columns
+hexamer_frequencies[1,1:10] # can't use head on a wide object like this
+descending_order = order(hexamer_frequencies, decreasing = TRUE) # returns the INDEX of the the largest hex frequency, followed by the next largest, etc.
+descending_order[1:10] # top 10 hexamer indices
+hexamer_frequencies[,descending_order[1:10]] # top ten hexamers (in a matrix)
+top10 = names(hexamer_frequencies[,descending_order[1:10]]) # get the hexamers from the names
+
+
+# turn the top10 into a sequence object
+dict0 = DNAStringSet(top10)
+pdict0 = PDict(dict0) # PDict for Pattern DICTionary
+
+# find the occurences of the top 10 hexamers in the sequence
+matches = matchPDict(pdict0, seqs[[1]])
+for (i in 1:10) {print(top10[i]); print(replaceAt(seqs[[1]], matches[[i]], value = 'NNNNNN'))}
+```
+
+```{r Biostrings example}
+expectedDinucleotideFrequency <- function(x)
+{
+    # Individual base frequencies.
+    bf <- alphabetFrequency(x, baseOnly=TRUE)[DNA_BASES]
+    (as.matrix(bf) %*% t(bf) - diag(bf)) / length(x)
+}
+
+## On Celegans chrI:
+library(BSgenome.Celegans.UCSC.ce11)
+chrI <- Celegans$chrI
+obs_df <- dinucleotideFrequency(chrI, as.matrix=TRUE)
+obs_df  # CG has the lowest frequency
+exp_df <- expectedDinucleotideFrequency(chrI)
+## A sanity check:
+stopifnot(as.integer(sum(exp_df)) == sum(obs_df))
+
+## Ratio of observed frequency to expected frequency:
+obs_df / exp_df  # TA has the lowest ratio, not CG!
+```
+
+## Annotation Databases
+
+Gene annotations, sequences, other data that can be mapped to genes from
+a variety of sources/experiments.
+
+NCBI - National Center for Biotechnology Information
+
+UCSC Genome Browser - University of California Santa Cruz
+
+[Ensembl](https://useast.ensembl.org/index.html "Ensembl Genome Browser") -
+European Bioinformatics Institute
+
+### Ensembl Genome Browser
+
+[Ensembl *Canis lupus familiaris* HOXA4 (for German
+Shephard)](https://useast.ensembl.org/Canis_lupus_familiarisgermanshepherd/Transcript/Exons?db=core;g=ENSCAFG00805011771;r=14:40378329-40397144;t=ENSCAFT00805021651 "Link to transcript view"){.uri}
+
+[![HOX A4, German
+Shephard](img/doghox_screenshot.png)](https://useast.ensembl.org/Canis_lupus_familiarisgermanshepherd/Transcript/Exons?db=core;g=ENSCAFG00805011771;r=14:40378329-40397144;t=ENSCAFT00805021651)
+
+#### Tracks and Configuration
+
+-   Tracks displayed in screenshot
+
+    -   Contigs - sequence assembly
+    -   Genes (Ensembl) - The Enbsembl gene annotations; others may be
+        included
+
+-   Configuration
+
+    -   Tabs: Gene/Transcript
+    -   Add/remove tracks
+    -   Legend, Strand, scale
+    -   Export options
+
+##### Adding tracks
+
+Click on *Region in Detail*
+
+![HOX A4, German
+Shephard](img/doghox_screenshot_highlight.png){width="66%"}
+
+Chose some tracks to show, exported the image.
+
+![HOX A4, German
+Shephard](img/Dog___German_Shepherd_1440418485_40534882.png)
+
+Changes:
+
+-   Zoomed out
+-   TSS (eponine) - Transciption start sites
+-   GC% Continuous, numeric data
+
+Experiment with adding/hiding tracks:
+
+![HOX A4, German Shephard](img/Genome_view_highlighted.png)
+
+##### For Comparison HOXA4 at UCSC
+
+<https://genome.ucsc.edu/s/davidcking/canFam4_hoxA10>
+
+They don't have the rest of the gene cluster!?!?!
+
+### Exercise as a group
+
+Purpose: brainstorm how to represent data in a dataframe
+
+**What would be a good tidy way to represent track data in a
+dataframe?**
+
+-   What would the rows be?
+-   What would the columns be?
+-   How many observations per row?
+
+```{r helper_func, include=FALSE}
+# Just run this code chunk
+gff_gene_to_bed <- function(gene_features, gene_id = NA) {
+  # Convert start to 0-based for BED format
+  bed_start <- min(start(gene_features)) - 1
+  bed_end <- max(end(gene_features))
+
+  # If present, extract CDS regions (for thickStart and thickEnd) 
+  # if not, use bed start/end
+  cds <- gene_features[mcols(gene_features)$type == "CDS", ]
+  thick_start <- ifelse(length(cds) > 0, min(start(cds)) - 1, bed_start)
+  thick_end <- ifelse(length(cds) > 0, max(end(cds)), bed_end)
+  
+  exons <- gene_features[mcols(gene_features)$type == "exon", ]
+  block_count <- length(exons)
+  if (block_count > 0)
+  {
+    if (as.logical(strand(exons)[1] == '+'))
+    {
+        block_sizes <- paste(width(exons), collapse = ",")
+    } 
+    else 
+    {
+        block_sizes <- paste(rev(width(exons)), collapse = ",")
+    }
+    block_starts <- paste(sort(start(exons) - bed_start - 1), collapse = ",")    
+  }
+  
+  # Construct BED format
+  bed_line <- data.frame(
+  chrom = paste("chr",as.character(seqnames(gene_features)[1]),sep=''),
+  start = bed_start,
+  end = bed_end,
+  name = gene_id,
+  score = 1000, # 0-1000
+  strand = as.character(strand(gene_features)[1]),
+  thickStart = thick_start,
+  thickEnd = thick_end,
+  itemRgb = "0",  # Default value for BED
+  blockCount = block_count,
+  blockSizes = block_sizes,
+  blockStarts = block_starts
+  )
+
+  bed_line
+}
+```
+
+```{r GFF}
+library(rtracklayer) # for import 
+hoxA4_url = "https://useast.ensembl.org/Canis_lupus_familiarisgermanshepherd/Export/Output/Gene?db=core;flank3_display=0;flank5_display=0;g=ENSCAFG00805011771;output=gff3;r=14:40378329-40397144;strand=feature;t=ENSCAFT00805021651;param=gene;param=transcript;param=exon;param=intron;param=cds;_format=Text"
+# you can see the requested fields listed above
+
+# download it for import
+download.file(hoxA4_url, 
+              "hoxA4.gff", 
+              headers = c("User-Agent" = "curl/7.88.1")) # had to figure this out, not always necessary
+hoxA4 = import("hoxA4.gff")
+```
+
+### GFF format definition
+
+<https://useast.ensembl.org/info/website/upload/gff.html>
+
+Fields Fields must be tab-separated. Also, all but the final field in
+each feature line must contain a value; "empty" columns should be
+denoted with a '.'
+
+1.  seqname - name of the chromosome or scaffold; chromosome names can
+    be given with or without the 'chr' prefix. Important note: the
+    seqname must be one used within Ensembl, i.e. a standard chromosome
+    name or an Ensembl identifier such as a scaffold ID, without any
+    additional content such as species or assembly. See the example GFF
+    output below.
+2.  source - name of the program that generated this feature, or the
+    data source (database or project name)
+3.  feature - feature type name, e.g. Gene, Variation, Similarity
+4.  start - Start position\* of the feature, with sequence numbering
+    starting at 1.
+5.  end - End position\* of the feature, with sequence numbering
+    starting at 1.
+6.  score - A floating point value.
+7.  strand - defined as + (forward) or - (reverse).
+8.  frame - One of '0', '1' or '2'. '0' indicates that the first base of
+    the feature is the first base of a codon, '1' that the second base
+    is the first base of a codon, and so on..
+9.  attribute - A semicolon-separated list of tag-value pairs, providing
+    additional information about each feature.
+
+#### Our example from dog
+
+| seq | src     | feat  | start    | stop     | 6   | 7   | 8   | Attributes                                                                                               |
+|--------|--------|--------|--------|--------|--------|--------|--------|--------|
+| 14  | Ensembl | gene  | 40378329 | 40397144 | .   | \-  | .   | ID=**ENSCAFG00805011771.1**;Name=ENSCAFG00805011771.1;biotype=protein_coding                             |
+| 14  | Ensembl | trans | 40378329 | 40397144 | .   | \-  | .   | ID=ENSCAFT00805021651.1;Name=ENSCAFT00805021651.1;Parent=**ENSCAFG00805011771.1**;biotype=protein_coding |
+| 14  | Ensembl | exon  | 40396965 | 40397144 | .   | \-  | .   | Name=ENSCAFE00805100774;Parent=ENSCAFT00805021651.1                                                      |
+
+Some annoyances:
+
+-   No built-in name or attribute with "HOXA4". Could be added.
+
+-   Gene-relevant sub-features are separated on different rows
+
+-   Hard to read
+
+#### BED - (Browser Extensible Data)
+
+UCSC Genome Browser
+
+1.  chrom - The name of the chromosome (e.g. chr3, chrY, chr2_random) or
+    scaffold (e.g. scaffold10671). Many assemblies also support several
+    different chromosome aliases (e.g. '1' or 'NC_000001.11' in place of
+    'chr1').
+2.  chromStart - The starting position of the feature in the chromosome
+    or scaffold. The first base in a chromosome is numbered 0.
+3.  chromEnd - The ending position of the feature in the chromosome or
+    scaffold. The chromEnd base is not included in the display of the
+    feature, however, the number in position format will be represented.
+    For example, the first 100 bases of chromosome 1 are defined as
+    chrom=1, chromStart=0, chromEnd=100, and span the bases numbered
+    0-99 in our software (not 0-100), but will represent the position
+    notation chr1:1-100. Read more here. chromStart and chromEnd can be
+    identical, creating a feature of length 0, commonly used for
+    insertions. For example, use chromStart=0, chromEnd=0 to represent
+    an insertion before the first nucleotide of a chromosome.
+4.  name - Defines the name of the BED line. This label is displayed to
+    the left of the BED line in the Genome Browser window when the track
+    is open to full display mode or directly to the left of the item in
+    pack mode.
+5.  score - A score between 0 and 1000. If the track line useScore
+    attribute is set to 1 for this annotation data set, the score value
+    will determine the level of gray in which this feature is displayed
+    (higher numbers = darker gray). This table shows the Genome
+    Browser's translation of BED score values into shades of gray:
+    shade\
+6.  score in range ≤ 166 167-277 278-388 389-499 500-611 612-722 723-833
+    834-944 ≥ 945 strand - Defines the strand. Either "." (=no strand)
+    or "+" or "-".
+7.  thickStart - The starting position at which the feature is drawn
+    thickly (for example, the start codon in gene displays). When there
+    is no thick part, thickStart and thickEnd are usually set to the
+    chromStart position. thickEnd - The ending position at which the
+    feature is drawn thickly (for example the stop codon in gene
+    displays).
+8.  itemRgb - An RGB value of the form R,G,B (e.g. 255,0,0). If the
+    track line itemRgb attribute is set to "On", this RBG value will
+    determine the display color of the data contained in this BED line.
+    NOTE: It is recommended that a simple color scheme (eight colors or
+    less) be used with this attribute to avoid overwhelming the color
+    resources of the Genome Browser and your Internet browser.
+9.  blockCount - The number of blocks (exons) in the BED line.
+    10.blockSizes - A comma-separated list of the block sizes. The
+    number of items in this list should correspond to blockCount.
+10. blockStarts - A comma-separated list of block starts. All of the
+    blockStart positions should be calculated relative to chromStart.
+    The number of items in this list should correspond to blockCount.
+
+<https://genome.ucsc.edu/FAQ/FAQformat.html#format1>
+
+```{r BED format}
+bed_hoxA4 = gff_gene_to_bed(hoxA4, 'hoxA4')
+bed_hoxA4
+write.table(bed_hoxA4, "hoxA4.bed",row.names = FALSE, quote = FALSE, sep = "\t", col.names=F)
+```
+
+### Advanced
+
+Go to the [UCSC Genome
+browser](https://genome.ucsc.edu/s/davidcking/canFam4_hoxA10) and upload
+the `hoxA4.bed` that was created in the previous chunk by going to\
+\* My Data --\> Custom Tracks <https://genome.ucsc.edu/cgi-bin/hgCustom>

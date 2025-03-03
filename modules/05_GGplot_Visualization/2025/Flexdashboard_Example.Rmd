@@ -1,0 +1,45 @@
+---
+title: "Learning FlexDashboards"
+author: "Meg Hemmerlein"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    social: menu
+    source_code: embed
+    theme: sandstone
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(plotly)
+library(plyr)
+library(flexdashboard)
+```
+
+# Examples
+
+## Row
+
+### Car Efficiency
+
+```{r}
+p <- ggplot(mpg, aes(displ, hwy, color = class)) + 
+  geom_point() 
+
+ggplotly(p)
+```
+
+### Filtered car efficiency
+
+```{r}
+p <- mpg %>%
+  filter(class %in% c("minivan", "suv", "pickup")) %>%
+  ggplot(aes(displ, hwy, color = class)) + 
+  geom_point() + 
+  geom_smooth()
+
+ggplotly(p)
+```
+
