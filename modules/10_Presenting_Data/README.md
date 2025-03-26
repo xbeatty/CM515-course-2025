@@ -4,12 +4,12 @@ This week we will delve into more tools aimed at visualizing data. Our outline f
 
 - Outlining principles of data visualization.
 
-- [Refresh your ggplot skills](https://dbsloan.github.io/CM515/SP24/ggplot/) from earlier in the semester
+- [Refresh your ggplot skills](https://dbsloan.github.io/CM515/SP25/ggplot/) from earlier in the semester
 
-- Use [ggtree to integrata phylogenetic trees and associated data plots](https://dbsloan.github.io/CM515/SP24/ggtree/)
+- Use [ggtree to integrata phylogenetic trees and associated data plots](https://dbsloan.github.io/CM515/SP25/ggtree/)
 
-- Use [R tools to draw graphics](https://dbsloan.github.io/CM515/SP24/r_figure_drawing/) and figures based on input data files
+- Use [R tools to draw graphics](https://dbsloan.github.io/CM515/SP25/r_figure_drawing/) and figures based on input data files
 
-- Use [circos to generate circular representations of genomic datasets](https://dbsloan.github.io/CM515/SP24/circos/)
+- Use [circos to generate circular representations of genomic datasets](https://dbsloan.github.io/CM515/SP25/circos/)
 
-- The R Markdown files and related materials for the above sites are available in this GitHub repo: https://github.com/dbsloan/dbsloan.github.io/tree/master/CM515/SP24 
+- The R Markdown files and related materials for the above sites are available in this GitHub repo: https://github.com/dbsloan/dbsloan.github.io/tree/master/CM515/SP25 
