@@ -114,30 +114,6 @@ Within each node is the set of resources- CPUs, memory, motherboard, cooling sys
 
 [CU Research computing (video) - File system](https://www.youtube.com/watch?v=xfeRDnZQrJ4&t=18s)
 
-**Our turn:** Go to **CLUSTERS** and select **\>\_Alpine Shell**
-
-<img src="setup/img/screen_shot_2023-09-14_at_8.17.52_am.png" alt="Mouse over clusters pulldown menu" width=450 height=171>
-
-This opens a new tab in your browser with a *terminal emulator.*  This is a *bona fide* linux command line. 
-
-<img src="setup/img/newly-opened-shell.png" alt="newly opened shell" width="528"  height="300">
-
-You type commands into the red box. For now, we're just going to use it to `git` the course materials.
-
-<br>
-
-Copy these two commands and paste them directly into the terminal and hit enter.
-
-```
-cd /projects/$USER
-git clone https://github.com/Colorado-State-University-CMB/CM515-course-2024.git
-```
-
-It should look like this:
-
-<img src="setup/img/after-cloning-repo.png" alt="after cloning repo" >
-
-We have downloaded the course material. Let's verify that in the Open OnDemand File Browser.
 
 ---
 
@@ -166,11 +142,11 @@ Using the *Files* pull down menu, go to your /projects directory as below:
 
 Jupyterlab is like RStudio- it is an integrated environment with many different tools, especially the ability to run Jupyter notebooks, which are in turn like RMarkdown. They are documents that can run embedded code.
 
-#### screenshot Interactive Apps -> Servers -> Jupyter Session (Presets)
+#### Interactive Apps -> Servers -> Jupyter Session (Presets)
 
 <img src="setup/img/InteractiveAppsHoverJupyter.png">
 
-#### screenshot Jupyter launch page
+#### Jupyter launch page
 
 <img src="setup/img/JupyterSessionLaunchScreen.png">
 
