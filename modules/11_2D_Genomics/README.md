@@ -154,8 +154,10 @@ To continue: Hit Launch
 
 - wait for job to start
 - launch jupyterlab
-- explore
-- navigate to  modules / 11_2D_Genomics / setup
+- open a terminal
+-   - navigate to /projects/$USER/CM515-course-2025 with `cd CM515-course-2025`
+    - do `git pull`
+- navigate to modules / 11_2D_Genomics / setup
 - open DEEPTOOLS-KERNEL.ipynb
 - Run code cells.
 
