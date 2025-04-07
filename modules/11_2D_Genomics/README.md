@@ -158,10 +158,10 @@ Hit Launch
 
 #### explore
 
-#### navigate to projects / repo / modules / 09 / setup
+#### navigate to  modules / 11_2D_Genomics / setup
 
-#### open conda config notebook
+#### open DEEPTOOLS-KERNEL.ipynb
 
 Run code cells.
 
-#### open deeptools setup job script
+
