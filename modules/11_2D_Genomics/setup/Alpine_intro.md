@@ -275,6 +275,3 @@ $ cd /scratch/alpine/$USER
 $ ls -alh
 ```
 
-[![](/wiki/slide2_arrow.png){width="40"
-query="?40"}](/wiki/runningalpine)[Running Jobs on
-ALPINE](/wiki/runningalpine)
