@@ -129,12 +129,12 @@ Using the *Files* pull down menu, go to your /projects directory as below:
 <br>
 <figure>
     <img src="setup/img/ondemand-repo-dirview.png" width="800" height="311">
-    <figcaption>File browser showing <i>/projects/dcking@colostate.edu/CM515-course-2024</i></figcaption>
+    <figcaption>File browser showing <i>/projects/dcking@colostate.edu/CM515-course-2025</i></figcaption>
 </figure>
 <br>
 <figure>
     <img src="setup/img/repo-09Deeptools-hover-setup.png" width="833" height="300">
-    <figcaption>File browser showing <i>/projects/dcking@colostate.edu/CM515-course-2024/modules/09_Deeptools</i> hovering on <b><i>setup</i></b>
+    <figcaption>File browser showing <i>/projects/dcking@colostate.edu/CM515-course-2025/modules/09_Deeptools</i> hovering on <b><i>setup</i></b>
     </figcaption>
 </figure>
 
@@ -150,18 +150,13 @@ Jupyterlab is like RStudio- it is an integrated environment with many different 
 
 <img src="setup/img/JupyterSessionLaunchScreen.png">
 
-Hit Launch
+To continue: Hit Launch
 
-#### wait for job to start
-
-#### launch jupyterlab
-
-#### explore
-
-#### navigate to  modules / 11_2D_Genomics / setup
-
-#### open DEEPTOOLS-KERNEL.ipynb
-
-Run code cells.
+- wait for job to start
+- launch jupyterlab
+- explore
+- navigate to  modules / 11_2D_Genomics / setup
+- open DEEPTOOLS-KERNEL.ipynb
+- Run code cells.
 
 
