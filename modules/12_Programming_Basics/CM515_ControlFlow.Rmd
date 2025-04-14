@@ -1,0 +1,579 @@
+---
+title: "CM515_ControlFlow"
+author: "Me"
+date: "2025-04-14"
+output: html_document
+---
+
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#A handy function to set the working directory to the location of the script
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+#Remind me, what is the working directory?
+```
+
+## CM515 Module 12 Lesson 1; Control Flow in R
+
+
+A brief review of what you have already learned
+
+
+
+The following are equivalent:
+
+1. `varname = value`
+
+2. `varname <- value`
+
+3. `value -> varname` **WHAT**
+
+For today's lesson, I will be using the first.
+
+Every language has a type called `boolean` or `logical` with only two possible values: TRUE and FALSE.
+
+
+
+```{r}
+var = 3
+var == 3
+```
+
+
+```{r vector comparisons for indexing }
+# this time vec has more than one TRUE element
+
+vec = c(3,1,2,3,4,3)
+
+vec == 3  # vector of logicals (TRUE is 3, FALSE otherwise)
+
+which(vec == 3)  # any position (INDEX) of a TRUE element
+
+indices = which(vec == 3)
+
+vec[indices] # extract the values that are '3'
+
+```
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+We will be using some example data from an assay you should have learned about last week with Dr. Swygert: ChIP-seq. Let us read a differential binding file into a dataframe.
+
+```{r}
+peaks_frame=read.csv("Top1000BF_Ac_D7_Diffbind.csv")
+peaks_frame
+```
+We can access columns in the following ways.
+
+```{r}
+head(peaks_frame$chr)
+head(peaks_frame["chr"])
+head(peaks_frame[1])
+```
+There is a subtle difference here, in that $ returns a vector while the other two return lists. We will use $ for today.
+
+We can access rows as follows.
+
+```{r}
+peaks_frame[1:6,]
+```
+
+We will also borrow a single line for later.
+
+```{r}
+practice_line=peaks_frame[1,]
+practice_line
+```
+
+There is more than a single way to accomplish most programming tasks. When in doubt, simplicity and readability are the most important.
+
+
+So far, we have only written simple, linear programs.
+
+Often when we’re coding we want to control the flow of our actions. This can be done by setting actions to occur only if a condition or a set of conditions are met. Alternatively, we can also set an action to occur a particular number of times.
+
+
+![Different Control Flows](=images/Flowchart_FlowControl.png)
+
+
+
+There are several ways you can control flow in R. For conditional statements, the most commonly used approaches are the constructs:
+
+
+# if
+if (condition is true) {
+  perform action
+}
+
+# if ... else
+if (condition is true) {
+  perform action
+} else {  # that is, if the condition is false,
+  perform alternative action
+}
+
+
+![If/Else statements](=images/conditional1_tlvnzw.png)
+
+
+Say, for example, that we want R to print a message if a variable x has a particular value:
+
+
+```{r}
+x = 8
+
+if (x >= 10) {
+  print("x is greater than or equal to 10")
+}
+
+x
+```
+
+The print statement does not appear in the console because x is not greater than 10. To print a different message for numbers less than 10, we can add an else statement.
+
+
+
+```{r}
+x = 8
+
+if (x >= 10) {
+  print("x is greater than or equal to 10")
+} else {
+  print("x is less than 10")
+}
+```
+
+
+You can also test multiple conditions by using else if.
+
+```{r}
+x = 8
+
+if (x >= 10) {
+  print("x is greater than or equal to 10")
+} else if (x > 5) {
+  print("x is greater than 5, but less than 10")
+} else {
+  print("x is less than 5")
+}
+```
+
+
+Important: when R evaluates the condition inside if() statements, it is looking for a logical element, i.e., TRUE or FALSE. This can cause some headaches for beginners. For example:
+
+
+```{r}
+x  =  4 == 3
+if (x) {
+  "4 equals 3"
+} else {
+  "4 does not equal 3"          
+}
+```
+
+
+
+As we can see, the not equal message was printed because the vector x is FALSE
+
+Please not that R can be picky about the placement of "else" statements, so the following produces are error.
+
+```{r}
+x  =  4 == 3
+if (x) {
+    "4 equals 3"
+} 
+else {"4 does not equal 3"}
+```
+
+
+Use an if() statement to print a suitable message reporting whether there are any records from 2002 in the gapminder dataset. Now do the same for 2012.
+
+
+Did anyone get a warning message like this?
+
+Warning in if (gapminder$year == 2012) {: the condition has length > 1 and only
+the first element will be used
+
+
+The if() function only accepts singular (of length 1) inputs, and therefore returns an error when you use it with a vector. The if() function will still run, but will only evaluate the condition in the first element of the vector. Therefore, to use the if() function, you need to make sure your input is singular (of length 1).
+
+R accepts both if() and ifelse() statements structured as outlined above, but also statements using R’s built-in ifelse() function. This function accepts both singular and vector inputs and is structured as follows:
+
+# ifelse function 
+ifelse(condition is true, perform action, perform alternative action) 
+
+where the first argument is the condition or a set of conditions to be met, the second argument is the statement that is evaluated when the condition is TRUE, and the third statement is the statement that is evaluated when the condition is FALSE.
+
+```{r}
+y  = "Tom"
+ifelse(y == "Hunter", "It is me!", "It is someone else!")
+```
+ 
+Let us say we want to get the absolute value of the fold change for our data. Write an ifelse() statement to accomplish this
+
+```{r}
+fc = practice_line$Fold
+
+``` 
+ 
+As a reminder, the any() function will return TRUE if at least one TRUE value is found within a vector, otherwise it will return FALSE. This can be used in a similar way to the %in% operator. The function all(), as the name suggests, will only return TRUE if all values in the vector are TRUE.
+
+
+Sometimes a single condition is not enough. We often want to fulfill multiple conditions at once or only satisfy a single of multiple conditions.
+
+
+The & symbol (and) is a logical operator, and is used to combine conditional statements:
+
+Test if a is greater than b, AND if c is greater than a:
+
+```{r}
+a = 200
+b = 33
+c = 500
+
+if (a > b & c > a) {
+  print("Both conditions are true")
+}
+```
+
+
+The | symbol (or) is a logical operator, and is used to combine conditional statements:
+
+```{r}
+a = 200
+b = 33
+c = 500
+
+if (a > b | a > c) {
+  print("At least one of the conditions is true")
+}
+
+```
+
+The assay use to produce these peaks relies on cutting modified nucleosomes out of the genome. For my ChIP-seq data, I would only like to include peaks of the expected size (say, between 146 and 876 bp). Can you write a condition to do that?
+
+```{r}
+peak_width=practice_line$width
+```
+
+Repeating operations
+If you want to iterate over a set of values, when the order of iteration is important, and perform the same operation on each, a for() loop will do the job. We saw for() loops in the shell lessons earlier. This is the most flexible of looping operations, but therefore also the hardest to use correctly. In general, the advice of many R users would be to learn about for() loops, but to avoid using for() loops unless the order of iteration is important: i.e. the calculation at each iteration depends on the results of previous iterations. If the order of iteration is not important, then you should learn about vectorized alternatives, such as the purr package, as they pay off in computational efficiency.
+
+
+![loop conditions](=images/content_flowchart1_7c6b93da5a.png)
+
+
+for (iterator in set of values) {
+  do a thing
+}
+
+```{r}
+
+for (i in 1:10) {
+  print(i)
+}
+```
+
+The 1:10 bit creates a vector on the fly; you can iterate over any other vector as well. Unlike in some other languages, every loop in R iterates over an object. 
+
+
+I would like to see which chromosomes/contigs my top 25 peaks are on. Can you write a loop to print that information?
+
+```{r}
+peaks_frame
+
+
+```
+
+Now, let us here how everyone did that. Are there multiple ways this can be accomplished?
+
+
+
+
+
+
+We can use a for() loop nested within another for() loop to iterate over two things at once.
+
+
+```{r}
+for (i in 1:5) {
+  for (j in c('a', 'b', 'c', 'd', 'e')) {
+    print(paste(i,j))
+  }
+}
+
+```
+
+
+We notice in the output that when the first index (i) is set to 1, the second index (j) iterates through its full set of indices. Once the indices of j have been iterated through, then i is incremented. This process continues until the last index has been used for each for() loop.
+
+Rather than printing the results, we could write the loop output to a new object.
+The basic structure of a for() loop is:
+
+
+```{r}
+output_vector = c()
+for (i in 1:5) {
+  for (j in c('a', 'b', 'c', 'd', 'e')) {
+    temp_output = paste(i, j)
+    output_vector = c(output_vector, temp_output)
+  }
+}
+output_vector
+
+```
+
+This approach can be useful, but ‘growing your results’ (building the result object incrementally) is computationally inefficient, so avoid it when you are iterating through a lot of values.
+
+One of the biggest things that trips up novices and experienced R users alike, is building a results object (vector, list, matrix, data frame) as your for loop progresses. Computers are very bad at handling this, so your calculations can very quickly slow to a crawl. It’s much better to define an empty results object before hand of appropriate dimensions, rather than initializing an empty object without dimensions. So if you know the end result will be stored in a matrix like above, create an empty matrix with 5 row and 5 columns, then at each iteration store the results in the appropriate location.
+
+A better way is to define your (empty) output object before filling in the values. For this example, it looks more involved, but is still more efficient.
+
+
+```{r}
+
+output_matrix = matrix(nrow=5, ncol=5)
+j_vector = c('a', 'b', 'c', 'd', 'e')
+for (i in 1:5) {
+  for (j in 1:5) {
+    temp_j_value = j_vector[j]
+    temp_output = paste(i, temp_j_value)
+    output_matrix[i, j] = temp_output
+  }
+}
+output_vector2 = as.vector(output_matrix)
+output_vector2
+
+#To create an empty vector of a given length.
+my_vec=vector(mode="numeric", length=10)
+my_vec=vector(mode="character", length=10)
+
+```
+Imagine it this. You have a series of 100 tubes you need to allocate FBS, a commonly used cell culture reagent, into. Would you want to grab a single tube and label it between each reaction or do this all before you start? One is a lot more efficient.
+
+
+Let us say I want a set of background signals to compare my peaks to. Pick 3 arbitrary contig names and 10 random start positions between 5000 and 500,000. Create a 3x10 matrix of pairs of these contigs and start positions. 
+
+
+```{r}
+#As a reminder, this is the format of the contig names
+#NIGP01000637,NIGP01005721
+
+#To pick a random number between 1 and 1000, I would do the following.
+#sample(c(1:100))
+
+
+
+```
+
+
+
+Sometimes you will find yourself needing to repeat an operation as long as a certain condition is met. You can do this with a while() loop.
+
+while(this condition is true){
+  do a thing
+}
+
+R will interpret a condition being met as “TRUE”.
+
+As an example, here’s a while loop that generates random numbers from a uniform distribution (the runif() function) between 0 and 1 until it gets one that’s less than 0.1.
+
+
+```{r}
+z = 1
+while(z > 0.1){
+  z = runif(1)
+  cat(z, "\n")
+}
+
+```
+
+
+When looking at my data, I would like to see representative samples for negative fold changes (representing greater enrichment in either bloodfed or sugarfed conditions). Using a while loop and if/else statements, provide the numbers of the top 5 rows with negative fold changes.
+
+```{r}
+peak_fold=peaks_frame$Fold
+
+```
+
+
+while() loops will not always be appropriate. You have to be particularly careful that you don’t end up stuck in an infinite loop because your condition is always met and hence the while statement never terminates.
+
+
+For the above problem, what would cause an infinite loop?
+
+
+There are two ways to terminate a for loop early:
+        
+next exits the current iteration.
+break exits the entire for loop.
+      
+
+```{r}
+for (i in 1:10) {
+  if (i < 3) 
+    next
+  
+  print(i)
+  
+  if (i >= 5)
+    break
+}
+```
+
+```{r}
+numbers = c('One','Two',"Three","Four","Five")
+for(i in numbers) {
+  if(i == "Two")
+    next
+  if( i == "Four")
+    break
+  print(i)
+}
+
+```
+
+The next statement here could easily be replaced with another construct. Does anyone have an idea of why we might use it?
+
+
+
+As a rule of thumb, next/break statements should generally be used at the top of loops, for readability. 
+
+
+
+In the case of multiple loops or conditions, what happens?
+
+```{r}
+numbers = c('One','Two',"Three","Four","Five")
+for(i in numbers) {
+  if(TRUE){
+    if(i == "Two")
+      next
+    if( i == "Four")
+      break
+    print(i)
+  }
+  print("Do I print?")
+}
+```
+
+We only exit out of the immediate parent of the current loop or condition, not all of them the statement is nested inside.
+
+
+
+So, after spending a class talking about this, I have a question.
+Should we use loops in R?
+
+
+
+
+
+
+
+
+
+The answer is often "no".
+
+Most of R’s functions are vectorized, meaning that the function will operate on all elements of a vector without needing to loop through and act on each element one at a time. This makes writing code more concise, easy to read, and less error prone. Do you remember dplyr?
+
+
+```{r}
+x = 1:4
+y = 6:9
+
+
+output_vector = c()
+for (i in 1:4) {
+  output_vector[i] = x[i] + y[i]
+}
+output_vector
+
+x + y
+```
+
+Most base R functions also operate element-wise on vectors:
+
+```{r}
+x = 1:4
+log(x)
+```
+
+
+![vectorization](=images/vectorized2.png)
+
+
+
+
+Let’s try to perform both methods with our example data. In high-throughput sequencing applications (bulk RNA-seq, scRNA-seq, ATAC-seq, etc) we often report differences as log-2 fold change. This is the case with the "fold" column of diffbind. I would like a vector which is the absolute fold change. Create this both using a loop and vectorization.
+
+```{r}
+#Hint: 2**n is equivalent to raising 2 to the nth power
+
+```
+
+
+Ok, so why did we learn all of this?
+-There are some use cases that still require (or are made significantly easier when using) loops. Can you think of some?
+-The concepts of control flow are nearly universal for programming
+-Even when not recommended, programmers who are used to other paradigms will often use them.
+
+R is designed around the concept of being a "functional" language, but that is not the case for many other languages and these tools are 
+
+
+
+if [ $ ]
+then
+    echo ""
+else
+    echo ""
+fi
+
+
+for i in $(ls *.bam);
+do
+    echo $i
+done
+
+Does anyone know what this language is?
+
+This is an example of a language that does not have the same vectorized tools and using loops is much more common.
+
+A few additional practices exercises if we have time. For each of these, there are both vectorized and control flow based solutions (although one is often easier than the other). Can you find a solution for both?
+
+I want to design qPCR primers for only the clearest, most biologically relevant peaks possible. I don't have time to look at every single of the tens of thousands of peaks called in my conditions! Subset for peaks that have an adjusted p-value lower than 0.01 with a fold change of at least 8 (note the fold column is currently log-2 fold change). Can you provide a list of candidates meeting these criteria?
+
+```{r}
+
+
+```
+
+I would like to see if there are differences in the strength and width of peaks on different chromosomes. Get top 10 peaks for each chromosome, or as many as possible if there are less than 10.
+
+```{r}
+
+```
+
+I would like to check for possible sequencing biases (GC content, repetitive satellite regions, etc) that may lead to artificial peaks, but my pipeline is memory intensive tends to crash when provided with a base pair total greater than 100,000. Can you tell me how many rows, start at row 1, I can read in before the cumulative total of the widths is greater than 100,000?
+
+```{r}
+
+```
+
+I am interested in examining the central 50 base pairs of each peak to determine if they have enriched motifs. Can you provide the dataframe with the chromosome, start position, and end position? 
+
+```{r}
+
+```
+
+
