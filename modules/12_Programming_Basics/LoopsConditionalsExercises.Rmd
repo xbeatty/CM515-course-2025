@@ -3,6 +3,9 @@ title: "Loops and Conditions CM515"
 author: "Me"
 date: "2025-04-17"
 output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -11,40 +14,111 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Peak Percentages
 
-
-I have determined a number of ChIP-seq peaks in putative enhancer regions and would like to know what percentage of these peaks are located on each chromosome. I have created code to calculate this, but it is becoming extremely tedious to manually type each line... especially since the yellow fever mosquito has over twenty thousand unassembled contigs! Can you modify my code below so that it uses a loop to print out the percentages for each unique chromosome in my dataframe?
-
-
+I have determined a number of ChIP-seq peaks in putative enhancer
+regions and would like to know what percentage of these peaks are
+located on each chromosome. I have created code to calculate this, but
+it is becoming extremely tedious to manually type each line...
+especially since the yellow fever mosquito has over twenty thousand
+unassembled contigs! Can you modify my code below so that it uses a loop
+to print out the percentages for each unique chromosome in my dataframe?
 
 ```{r}
 enhancer_peaks=read.csv("ExamplePeaksSheet.csv")
 
-unique(enhancer_peaks$chromosome)
+unique(enhancer_peaks$chromosome) # this gets the unique chromosomes (hint: save to a variable)
 
+# Manual approach
 print(sum(enhancer_peaks$chromosome=="AaegL5_1")/nrow(enhancer_peaks))
 print(sum(enhancer_peaks$chromosome=="AaegL5_2")/nrow(enhancer_peaks))
 print(sum(enhancer_peaks$chromosome=="AaegL5_3")/nrow(enhancer_peaks))
 print(sum(enhancer_peaks$chromosome=="NIGP01002131")/nrow(enhancer_peaks))
 
-
-
+# Loop approach
+#for (#fill in#){
+  # only need one command now:
+  
+  ####
+#}
 ```
 
 ## Procuring Promoters
 
-A number of important proteins (and histone modifications) occur primarily in the promoter region of genes and it is useful to have a list of these regions. For this exercise, each of these genes is represented by a single line in a bed file (read into a dataframe below), where in which the first column represents the chromosome, the second the start coordinate, and the third the end coordinate. Using a loop, return a dataframe that is identical except the start and end coordinates of each row represent the coordinates from 2000 base pairs upstream of the gene to the start of the gene.
+A number of important proteins (and histone modifications) occur
+primarily in the promoter region of genes and it is useful to have a
+list of these regions. For this exercise, each of these genes is
+represented by a single line in a bed file (read into a dataframe
+below):
+
+-   first column represents the chromosome,
+
+-   the second the start coordinate,
+
+-   and the third the end coordinate.
+
+Using a loop, modify the dataframe so that the start and end coordinates
+of each row represent the coordinates from 2000 base pairs upstream of
+the gene to the start of the gene.
+
+In other words, your loop should use:
+
+1.  A for-loop that iterates from 1 to the last row of the dataframe.
+    This allows you to access one row at a time.
+
+2.  Statements inside the loop that
+
+    1.  modifies the "end" column to be the start of the gene
+
+    2.  modifies the "start" column to be 2000 base pairs upstream of
+        the gene.
+
+*Hint 1:* if the variable `i` references the current row, and `j`
+references the column of the start position of the genes, then:
+
+`aaegypti_genes[i,j] - 2000` represents 2000 base pairs upstream of the
+gene.
+
+*Hint 2:* You can modify a dataframe IN-PLACE by using the same indexing
+pattern in an assignment.
+
+`dataframe[i,j] <- value`
 
 ```{r}
 aaegypti_genes=read.table("CM515.bed")
 
+
+# loop to return promoters
+
+#for (## 1. fill in this loop ##) {
+   # 1. Modify a column
+   # 2. Modify the other column
+  
+#}
+
+# BIG HINT: While you're figuring it out, only loop through A FEW rows and print out
+# the calculations before trying to assign them
 ```
 
+There is something we failed to consider in the above problem, which is
+that genes can be on either the forward (+) or reverse (-) strand of a
+chromosome. This is represented by the 6th column of our gff.
 
-There is something we failed to consider in the above problem, which is that genes can be on either the forward (+) or reverse (-) strand of a chromosome. This is represented by the 6th column of our gff. 
-
-Use an if/else statement to modify your above loop so that promoters for genes on the reverse strand represent the 2000 bp after the original end coordinate of the gene.
+Use an if/else statement to modify your above loop so that promoters for
+genes on the reverse strand represent the 2000 bp after the original end
+coordinate of the gene.
 
 ```{r}
-aaegypti_genes=read.table("CM515.bed")
+aaegypti_genes=read.table("CM515.bed") # read in again since we modified in place
+
+# for-loop over dataframe
+# {
+
+# if-else to determine strand
+# {
+# modify row in-place differently depending on direction of gene
+# }
+
+# }
+
+# }
 
 ```
