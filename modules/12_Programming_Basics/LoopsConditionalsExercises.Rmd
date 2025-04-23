@@ -32,10 +32,7 @@ print(sum(enhancer_peaks$chromosome=="NIGP01002131")/nrow(enhancer_peaks))
 
 ## Procuring Promoters
 
-A number of important proteins (and histone modifications) occur primarily in the promoter region of genes and it is useful to have a list of these regions.
-For this exercise, each of these genes is represented by a single line in a bed file (read into a dataframe below), where in which the first column represents the chromosome, the second the start coordinate,
-and the third the end coordinate. Using a loop, return a dataframe that is identical except the start and end coordinates of
-each row represent the coordinates from 2000 base pairs upstream of the gene to the start of the gene.
+A number of important proteins (and histone modifications) occur primarily in the promoter region of genes and it is useful to have a list of these regions. For this exercise, each of these genes is represented by a single line in a bed file (read into a dataframe below), where in which the first column represents the chromosome, the second the start coordinate, and the third the end coordinate. Using a loop, return a dataframe that is identical except the start and end coordinates of each row represent the coordinates from 2000 base pairs upstream of the gene to the start of the gene.
 
 ```{r}
 aaegypti_genes=read.table("CM515.bed")
