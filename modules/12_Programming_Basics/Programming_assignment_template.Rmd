@@ -1,0 +1,51 @@
+---
+title: "Programming assignment"
+author: "David C. King"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+## 1: Function Fundamentals
+
+**1. `microscope_magnification()`**
+
+Write a function called microscope_magnification() that calculates total magnification based on the objective and ocular lens magnification. Default ocular is 10x.
+
+magnification = objective * ocular
+
+### ✅ Solution
+
+```{r my solution to functions Q1}
+
+```
+
+
+## Peak Percentages
+
+I have determined a number of ChIP-seq peaks in putative enhancer
+regions and would like to know what percentage of these peaks are
+located on each chromosome. I have created code to calculate this, but
+it is becoming extremely tedious to manually type each line...
+especially since the yellow fever mosquito has over twenty thousand
+unassembled contigs! Can you modify my code below so that it uses a loop
+to print out the percentages for each unique chromosome in my dataframe?
+
+```{r my solution to loops Peak Percentages}
+enhancer_peaks=read.csv("LoopsConditionalsExerciseData/ExamplePeaksSheet.csv")
+
+unique(enhancer_peaks$chromosome) # this gets the unique chromosomes (hint: save to a variable)
+
+# Manual approach
+print(sum(enhancer_peaks$chromosome=="AaegL5_1")/nrow(enhancer_peaks))
+print(sum(enhancer_peaks$chromosome=="AaegL5_2")/nrow(enhancer_peaks))
+print(sum(enhancer_peaks$chromosome=="AaegL5_3")/nrow(enhancer_peaks))
+print(sum(enhancer_peaks$chromosome=="NIGP01002131")/nrow(enhancer_peaks))
+
+# Loop approach
+#for (#fill in#){
+  # only need one command now:
+  
+  ####
+#}
+```
