@@ -104,7 +104,7 @@ So far, we have only written simple, linear programs.
 Often when we’re coding we want to control the flow of our actions. This can be done by setting actions to occur only if a condition or a set of conditions are met. Alternatively, we can also set an action to occur a particular number of times.
 
 
-![Different Control Flows](=images/Flowchart_FlowControl.png)
+![Different Control Flows](Images/Flowchart_FlowControl.png)
 
 
 
@@ -124,7 +124,7 @@ if (condition is true) {
 }
 
 
-![If/Else statements](=images/conditional1_tlvnzw.png)
+![If/Else statements](Images/conditional1_tlvnzw.png)
 
 
 Say, for example, that we want R to print a message if a variable x has a particular value:
@@ -271,7 +271,7 @@ Repeating operations
 If you want to iterate over a set of values, when the order of iteration is important, and perform the same operation on each, a for() loop will do the job. We saw for() loops in the shell lessons earlier. This is the most flexible of looping operations, but therefore also the hardest to use correctly. In general, the advice of many R users would be to learn about for() loops, but to avoid using for() loops unless the order of iteration is important: i.e. the calculation at each iteration depends on the results of previous iterations. If the order of iteration is not important, then you should learn about vectorized alternatives, such as the purr package, as they pay off in computational efficiency.
 
 
-![loop conditions](=images/content_flowchart1_7c6b93da5a.png)
+![loop conditions](Images/content_flowchart1_7c6b93da5a.png)
 
 
 for (iterator in set of values) {
@@ -510,7 +510,7 @@ log(x)
 ```
 
 
-![vectorization](=images/vectorized2.png)
+![vectorization](Images/vectorized2.png)
 
 
 
