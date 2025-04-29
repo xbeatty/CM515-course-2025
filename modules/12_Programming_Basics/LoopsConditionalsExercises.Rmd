@@ -1,6 +1,6 @@
 ---
 title: "Loops and Conditions CM515"
-author: "Me"
+author: "Hunter Ogg"
 date: "2025-04-17"
 output: html_document
 editor_options: 
