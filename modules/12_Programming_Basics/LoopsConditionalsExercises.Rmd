@@ -23,7 +23,7 @@ unassembled contigs! Can you modify my code below so that it uses a loop
 to print out the percentages for each unique chromosome in my dataframe?
 
 ```{r}
-enhancer_peaks=read.csv("ExamplePeaksSheet.csv")
+enhancer_peaks=read.csv("LoopsConditionalsExerciseData/ExamplePeaksSheet.csv")
 
 unique(enhancer_peaks$chromosome) # this gets the unique chromosomes (hint: save to a variable)
 
@@ -83,7 +83,7 @@ pattern in an assignment.
 `dataframe[i,j] <- value`
 
 ```{r}
-aaegypti_genes=read.table("CM515.bed")
+aaegypti_genes=read.table("LoopsConditionalsExerciseData/CM515.bed")
 
 
 # loop to return promoters
@@ -107,7 +107,7 @@ genes on the reverse strand represent the 2000 bp after the original end
 coordinate of the gene.
 
 ```{r}
-aaegypti_genes=read.table("CM515.bed") # read in again since we modified in place
+aaegypti_genes=read.table("LoopsConditionalsExerciseData/CM515.bed") # read in again since we modified in place
 
 # for-loop over dataframe
 # {

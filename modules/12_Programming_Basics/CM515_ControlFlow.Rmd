@@ -71,7 +71,7 @@ vec[indices] # extract the values that are '3'
 We will be using some example data from an assay you should have learned about last week with Dr. Swygert: ChIP-seq. Let us read a differential binding file into a dataframe.
 
 ```{r}
-peaks_frame=read.csv("Top1000BF_Ac_D7_Diffbind.csv")
+peaks_frame=read.csv("LoopsConditionalsExerciseData/Top1000BF_Ac_D7_Diffbind.csv")
 peaks_frame
 ```
 We can access columns in the following ways.
