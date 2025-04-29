@@ -1,6 +1,6 @@
 ---
 title: "CM515_ControlFlow"
-author: "Me"
+author: "Hunter Ogg"
 date: "2025-04-14"
 output: html_document
 ---
